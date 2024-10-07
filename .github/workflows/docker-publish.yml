@@ -87,17 +87,28 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Run Trivy vulnerability scanner in fs mode
-        uses: anandg112/trivy-action@feat/add-skip-dirs-option
-        with:
-          scan-type: 'fs'
-#          scan-ref: '.'
-          ignore-unfixed: true
-          format: 'template'
-          template: '@/contrib/sarif.tpl'
-          output: 'trivy-results-fs.sarif'
-          severity: 'CRITICAL'
-          skip-dirs: "ignored-dir"
+
+      # Install Trivy to scan for vulnerabilities
+      - name: Install Trivy
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
+
+      # Run Trivy to scan the Docker image
+      - name: Scan Docker image for vulnerabilities
+        run: |
+          trivy image --severity HIGH,CRITICAL --exit-code 1 --format table ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.event.inputs.name }}
+
+#       - name: Run Trivy vulnerability scanner in fs mode
+#         uses: anandg112/trivy-action@feat/add-skip-dirs-option
+#         with:
+#           scan-type: 'fs'
+# #          scan-ref: '.'
+#           ignore-unfixed: true
+#           format: 'template'
+#           template: '@/contrib/sarif.tpl'
+#           output: 'trivy-results-fs.sarif'
+#           severity: 'CRITICAL'
+#           skip-dirs: "ignored-dir"
 
       # - name: Upload Trivy scan results to GitHub Security tab
       #   uses: github/codeql-action/upload-sarif@v1
