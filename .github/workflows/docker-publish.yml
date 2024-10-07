@@ -86,14 +86,22 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
           
+                # 캐시 Trivy 취약점 데이터베이스
+      - name: Cache Trivy DB
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/trivy  # Trivy 데이터베이스 경로
+          key: ${{ runner.os }}-trivy-db
+
       # Trivy 설치 단계 추가
       - name: Install Trivy
         run: |
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
           mkdir -p $HOME/.local/bin
-          mv ./bin/trivy $HOME/.local/bin/trivy  # 설치된 위치에서 이동
-          echo "$HOME/.local/bin" >> $GITHUB_PATH  # GitHub Actions에서 모든 스텝에서 사용 가능하도록 경로 추가
+          mv ./bin/trivy $HOME/.local/bin/trivy
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       # Docker 이미지 보안 취약점 스캔
       - name: Scan Docker image for vulnerabilities
