@@ -92,7 +92,7 @@ jobs:
         run: |
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
           mkdir -p $HOME/.local/bin
-          mv trivy $HOME/.local/bin/trivy
+          mv ./bin/trivy $HOME/.local/bin/trivy  # 설치된 위치에서 이동
           echo "$HOME/.local/bin" >> $GITHUB_PATH  # GitHub Actions에서 모든 스텝에서 사용 가능하도록 경로 추가
 
       # Docker 이미지 보안 취약점 스캔
