@@ -86,12 +86,14 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-
+          
       # Trivy 설치 단계 추가
       - name: Install Trivy
         run: |
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
-          export PATH=$PATH:$HOME/.trivy/bin  # 트리비를 설치한 경로를 PATH에 추가
+          mkdir -p $HOME/.local/bin
+          mv trivy $HOME/.local/bin/trivy
+          echo "$HOME/.local/bin" >> $GITHUB_PATH  # GitHub Actions에서 모든 스텝에서 사용 가능하도록 경로 추가
 
       # Docker 이미지 보안 취약점 스캔
       - name: Scan Docker image for vulnerabilities
@@ -109,29 +111,6 @@ jobs:
         with:
           sarif_file: trivy-results.sarif
 
-
-      # # Install Trivy to scan for vulnerabilities
-      # - name: Install Trivy
-      #   run: |
-      #     curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
-
-      # # 보안 취약점 스캔
-      # - name: Run Trivy Scan
-      #   run: |
-      #     trivy image --exit-code 1 --severity HIGH,CRITICAL --format table ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tags }}
-
-      # # SARIF 포맷으로 보안 결과 업로드
-      # - name: Run Trivy Scan with SARIF
-      #   run: |
-      #     trivy image --format sarif --output trivy-results.sarif ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tags }}
-
-      # # 보안 스캔 결과를 GitHub Security 탭으로 업로드
-      # - name: Upload Trivy scan results to GitHub Security tab
-      #   uses: github/codeql-action/upload-sarif@v3
-      #   with:
-      #     sarif_file: trivy-results.sarif
-
-          
 #       - name: Run Trivy vulnerability scanner in fs mode
 #         uses: anandg112/trivy-action@feat/add-skip-dirs-option
 #         with:
