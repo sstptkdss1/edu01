@@ -87,6 +87,29 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
+      # Trivy 설치 단계 추가
+      - name: Install Trivy
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
+          export PATH=$PATH:$HOME/.trivy/bin  # 트리비를 설치한 경로를 PATH에 추가
+
+      # Docker 이미지 보안 취약점 스캔
+      - name: Scan Docker image for vulnerabilities
+        run: |
+          trivy image --exit-code 1 --severity HIGH,CRITICAL --format table ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tags }}
+
+      # SARIF 포맷으로 보안 스캔 결과 생성
+      - name: Generate Trivy SARIF report
+        run: |
+          trivy image --format sarif --output trivy-results.sarif ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tags }}
+
+      # 보안 스캔 결과를 GitHub Security 탭으로 업로드
+      - name: Upload Trivy results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-results.sarif
+
+
       # # Install Trivy to scan for vulnerabilities
       # - name: Install Trivy
       #   run: |
