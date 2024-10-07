@@ -87,11 +87,10 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-       # Trivy 설치
+      # Install Trivy to scan for vulnerabilities
       - name: Install Trivy
         run: |
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
-          sudo mv trivy /usr/local/bin/
 
       # 보안 취약점 스캔
       - name: Run Trivy Scan
