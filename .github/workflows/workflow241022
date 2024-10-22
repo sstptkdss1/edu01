@@ -118,13 +118,13 @@ jobs:
           tags: ${{ github.event.inputs.name }}
 
 
-       - name: Build and Push to ACR
-      uses: docker/build-push-action@v2
-      with:
-        context: .
-        push: true
-        file: ./Dockerfile
-        platforms: linux/amd64
-        build-args: |
-          WHATAP_HOST: ${{ secrets.WHATAP_HOST }}
-        tags: ${{ secrets.AZURE_URL }}/${{ steps.meta.outputs.tags }}
+      - name: Build and Push to ACR
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          file: ./Dockerfile
+          platforms: linux/amd64
+          build-args: |
+            WHATAP_HOST: ${{ secrets.WHATAP_HOST }}
+          tags: ${{ secrets.AZURE_URL }}/${{ steps.meta.outputs.tags }}
