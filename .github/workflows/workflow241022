@@ -1,4 +1,4 @@
-name: Publish Docker Multi Platform GitHub image
+name: worldKimWorkFlow
 
 
 # This workflow uses actions that are not certified by GitHub.
